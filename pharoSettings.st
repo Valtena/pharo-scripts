@@ -1,7 +1,7 @@
 StartupPreferencesLoader default executeAtomicItems: {
 	StartupAction
 		name: 'Set the Author'
-		code: [ Author fullName: 'CyrilFerlicot' ]
+		code: [ Author fullName: 'YannLesage' ]
 		runOnce: true.
 
 	StartupAction
@@ -88,60 +88,13 @@ StartupPreferencesLoader default executeAtomicItems: {
 		code: [ MCRepositoryGroup default repositories select: [ :r | r location includesSubstring: 'Pharo/Pharo' ] thenDo: [ :r | MCRepositoryGroup default removeRepository: r ] ]
 		runOnce: true.
 		
-	StartupAction
-		name: 'Generate Accessor automatically'
-		code: [ Object compile: 'doesNotUnderstand: aMessage
-	| exception resumeValue message |
-	message := aMessage selector asString.
-	message last = $:
-		ifTrue: [ self class instVarNames
-				detect: [ :var | var = message allButLast ]
-				ifFound: [ :var | 
-					self class
-						compile:
-							(String
-								streamContents: [ :s | 
-									s
-										<< message;
-										<< '' anObject'';
-										<< String cr;
-										<< Character tab;
-										<< var;
-										<< '' := anObject'' ])
-						classified: ''accessing''.
-					UIManager default inform: ''Compiled: '' , message , '' into: '' , self printString.
-					^ aMessage sentTo: self ] ]
-		ifFalse: [ self class instVarNames
-				detect: [ :var | var = message ]
-				ifFound: [ :var | 
-					self class
-						compile:
-							(String
-								streamContents: [ :s | 
-									s
-										<< var;
-										cr;
-										<< Character tab;
-										<< ''^ '';
-										<< var ])
-						classified: ''accessing''.
-					UIManager default inform: ''Compiled: '' , message , '' into: '' , self printString.
-					^ aMessage sentTo: self ] ].
-	(exception := MessageNotUnderstood new)
-		message: aMessage;
-		receiver: self.
-	resumeValue := exception signal.
-	^ exception reachedDefaultHandler
-		ifTrue: [ aMessage sentTo: self ]
-		ifFalse: [ resumeValue ]' ]
-		runOnce: true.
 		
 	StartupAction
 		name: 'Set the default github-cache'
 		code: [ 
 			MCGitHubRepository cacheDirectory:
 				(((OSPlatform current isWindows
-					ifTrue: [ FileLocator C "This is a hack to shorten windows's paths because windows have a max path of 255 characters :(" ]
+					ifTrue: [ FileLocator D "This is a hack to shorten windows's paths because windows have a max path of 255 characters :(" ]
 					ifFalse: [ StartupPreferencesLoader preferencesGeneralFolder ]) / 'github-cache')
 					ensureCreateDirectory;
 					yourself)
